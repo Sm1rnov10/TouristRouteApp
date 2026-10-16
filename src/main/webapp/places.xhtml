@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>Туристические места</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+        }
+
+        header {
+            background: #3CB371;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border-bottom: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+
+        th {
+            background: #edf1f5;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 9px;
+            margin: 5px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #2E8B57;
+            color: white;
+            padding: 9px 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+            text-decoration: none;
+            width: auto;
+        }
+
+        .btn:hover {
+            background: #1f6391;
+        }
+
+        .danger {
+            background: #c0392b;
+        }
+
+        .danger:hover {
+            background: #922b21;
+        }
+
+        .actions {
+            min-width: 150px;
+        }
+
+        .actions .btn {
+            display: block;
+            width: 140px;
+            margin-bottom: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .description {
+            min-width: 180px;
+            max-width: 300px;
+        }
+
+        .coordinates {
+            min-width: 135px;
+        }
+
+        .error {
+            color: #c0392b;
+            margin-bottom: 15px;
+        }
+        .cost-column {
+            min-width: 110px;
+            white-space: nowrap;
+            text-align: left;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <header>
+        <h1>Туристические места</h1>
+    </header>
+
+    <main>
+
+        <h:link outcome="index"
+                value="← На главную"
+                styleClass="back"/>
+
+        <div class="panel">
+
+            <h2>Список туристических мест</h2>
+
+            <h:form id="tableForm">
+
+                <div class="table-wrapper">
+
+                    <h:dataTable value="#{placeBean.places}"
+                                 var="p">
+
+                        <h:column>
+                            <f:facet name="header">Название</f:facet>
+                            <h:outputText value="#{p.name}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Описание</f:facet>
+                            <div class="description">
+                                <h:outputText value="#{p.description}"/>
+                            </div>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Город и адрес</f:facet>
+                            <h:outputText value="#{p.address}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Координаты</f:facet>
+                            <div class="coordinates">
+                                <h:outputText value="#{p.coordinates}"/>
+                            </div>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Категория</f:facet>
+                            <h:outputText value="#{p.category}"/>
+                        </h:column>
+
+                        <h:column headerClass="cost-column"
+                                  styleClass="cost-column">
+
+                            <f:facet name="header">
+                                <h:outputText value="Стоимость"/>
+                            </f:facet>
+
+                            <h:outputText value="#{p.cost}">
+                                <f:convertNumber minFractionDigits="2"
+                                                 maxFractionDigits="2"/>
+                            </h:outputText>
+
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Действия</f:facet>
+
+                            <div class="actions">
+
+                                <h:commandButton value="Редактировать"
+                                                 action="#{placeBean.prepareEdit(p.id)}"
+                                                 styleClass="btn">
+                                    <f:ajax execute="@this"
+                                            render=":placeForm"/>
+                                </h:commandButton>
+
+                                <h:commandButton value="Удалить"
+                                                 action="#{placeBean.delete(p.id)}"
+                                                 styleClass="btn danger"
+                                                 onclick="return confirm('Удалить это место из базы данных и всех маршрутов?');"/>
+
+                            </div>
+
+                        </h:column>
+
+                    </h:dataTable>
+
+                </div>
+
+            </h:form>
+
+        </div>
+
+        <div class="panel">
+
+            <h2>Добавление и редактирование места</h2>
+
+            <h:form id="placeForm">
+
+                <div class="form-grid">
+
+                    <div>
+                        <h:outputLabel for="name"
+                                       value="Название"/>
+
+                        <h:inputText id="name"
+                                     value="#{placeBean.place.name}"
+                                     required="true"
+                                     requiredMessage="Введите название места"/>
+                    </div>
+
+                    <div>
+                        <h:outputLabel for="category"
+                                       value="Категория"/>
+
+                        <h:inputText id="category"
+                                     value="#{placeBean.place.category}"
+                                     required="true"
+                                     requiredMessage="Введите категорию"/>
+                    </div>
+
+                    <div>
+                        <h:outputLabel for="address"
+                                       value="Город и адрес"/>
+
+                        <h:inputText id="address"
+                                     value="#{placeBean.place.address}"
+                                     required="true"
+                                     requiredMessage="Введите город и адрес"/>
+                    </div>
+
+                    <div>
+                        <h:outputLabel for="coordinates"
+                                       value="Координаты"/>
+
+                        <h:inputText id="coordinates"
+                                     value="#{placeBean.place.coordinates}"/>
+                    </div>
+
+                    <div>
+                        <h:outputLabel for="cost"
+                                       value="Стоимость"/>
+
+                        <h:inputText id="cost"
+                                     value="#{placeBean.place.cost}">
+                            <f:convertNumber/>
+                            <f:validateDoubleRange minimum="0"/>
+                        </h:inputText>
+                    </div>
+
+                </div>
+
+                <h:outputLabel for="description"
+                               value="Описание"/>
+
+                <h:inputTextarea id="description"
+                                 value="#{placeBean.place.description}"
+                                 rows="4"/>
+
+                <h:messages styleClass="error"/>
+
+                <h:commandButton value="Сохранить"
+                                 action="#{placeBean.save}"
+                                 styleClass="btn"/>
+
+                <h:commandButton value="Очистить"
+                                 action="#{placeBean.prepareCreate}"
+                                 immediate="true"
+                                 styleClass="btn">
+                    <f:ajax execute="@this"
+                            render="@form"/>
+                </h:commandButton>
+
+            </h:form>
+
+        </div>
+
+    </main>
+
+</h:body>
+</html>

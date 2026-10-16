@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>Туристические маршруты</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #3CB371;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 60px auto;
+            text-align: center;
+        }
+
+        .cards {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #2E8B57;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .button:hover {
+            background-color: #1f6391;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <header>
+        <h1>Туристические маршруты</h1>
+    </header>
+
+    <main>
+        <h2>Добро пожаловать!</h2>
+
+        <div class="cards">
+
+            <div class="card">
+                <h2>Туристические места</h2>
+                <p>Список мест на нашем сайте.</p>
+
+                <h:link outcome="places"
+                        value="Перейти к местам"
+                        styleClass="button"/>
+            </div>
+
+            <div class="card">
+                <h2>Туристические маршруты</h2>
+                <p>Создание маршрутов и управление местами посещения.</p>
+
+                <h:link outcome="routes"
+                        value="Перейти к маршрутам"
+                        styleClass="button"/>
+            </div>
+
+        </div>
+    </main>
+
+</h:body>
+</html>

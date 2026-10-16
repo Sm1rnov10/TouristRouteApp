@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>Туристические маршруты</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+        }
+
+        header {
+            background: #3CB371;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #edf1f5;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            margin: 6px 0 15px;
+        }
+
+        .btn {
+            background: #2E8B57;
+            color: white;
+            padding: 9px 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .btn:hover {
+            background: #1f6391;
+        }
+
+        .danger {
+            background: #c0392b;
+        }
+
+        .danger:hover {
+            background: #922b21;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <header>
+        <h1>Туристические маршруты</h1>
+    </header>
+
+    <main>
+
+        <h:link outcome="index"
+                value="← На главную"
+                styleClass="back"/>
+
+        <div class="panel">
+
+            <h2>Список маршрутов</h2>
+
+            <h:form id="routesTableForm">
+
+                <h:dataTable value="#{routeBean.routes}" var="r">
+
+                    <h:column>
+                        <f:facet name="header">Название</f:facet>
+                        <h:outputText value="#{r.name}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Описание</f:facet>
+                        <h:outputText value="#{r.description}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Продолжительность</f:facet>
+                        <h:outputText value="#{r.durationMinutes} мин"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Действия</f:facet>
+
+                        <h:commandButton value="Редактировать"
+                                         action="#{routeBean.prepareEdit(r.id)}"
+                                         styleClass="btn">
+                            <f:ajax execute="@this"
+                                    render=":routeForm"/>
+                        </h:commandButton>
+
+                        <h:commandButton value="Места маршрута"
+                                         action="#{routeBean.selectRoute(r.id)}"
+                                         styleClass="btn">
+                            <f:ajax execute="@this"
+                                    render=":placesPanel"/>
+                        </h:commandButton>
+
+                        <h:commandButton value="Удалить"
+                                         action="#{routeBean.delete(r.id)}"
+                                         styleClass="btn danger"
+                                         onclick="return confirm('Удалить маршрут?');"/>
+
+                    </h:column>
+
+                </h:dataTable>
+
+            </h:form>
+        </div>
+
+        <div class="panel">
+
+            <h2>Создание и редактирование маршрута</h2>
+
+            <h:form id="routeForm">
+
+                <div class="form-group">
+                    <h:outputLabel for="routeName"
+                                   value="Название маршрута"/>
+
+                    <h:inputText id="routeName"
+                                 value="#{routeBean.route.name}"
+                                 required="true"/>
+                </div>
+
+                <div class="form-group">
+                    <h:outputLabel for="routeDescription"
+                                   value="Описание"/>
+
+                    <h:inputTextarea id="routeDescription"
+                                     value="#{routeBean.route.description}"
+                                     rows="4"/>
+                </div>
+
+                <h:messages style="color:red"/>
+
+                <h:commandButton value="Сохранить"
+                                 action="#{routeBean.save}"
+                                 styleClass="btn"/>
+
+                <h:commandButton value="Очистить"
+                                 action="#{routeBean.prepareCreate}"
+                                 immediate="true"
+                                 styleClass="btn">
+                    <f:ajax execute="@this" render="@form"/>
+                </h:commandButton>
+
+            </h:form>
+        </div>
+
+        <h:panelGroup id="placesPanel" layout="block">
+
+            <ui:fragment rendered="#{not empty routeBean.selectedRoute}">
+
+                <div class="panel">
+
+                    <h2>
+                        Места маршрута:
+                        #{routeBean.selectedRoute.name}
+                    </h2>
+
+                    <h:form id="routePlacesForm">
+
+                        <h:dataTable value="#{routeBean.routePlaces}"
+                                     var="rp">
+
+                            <h:column>
+                                <f:facet name="header">Порядок</f:facet>
+                                #{rp.visitOrder}
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Место</f:facet>
+                                #{rp.place.name}
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Время посещения</f:facet>
+                                #{rp.visitDurationMinutes} мин
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Действия</f:facet>
+
+                                <h:commandButton value="Удалить из маршрута"
+                                                 action="#{routeBean.removePlace(rp.place.id)}"
+                                                 immediate="true"
+                                                 styleClass="btn danger"
+                                                 onclick="return confirm('Удалить место из маршрута?');"/>
+
+                            </h:column>
+
+                        </h:dataTable>
+
+                        <h3>Добавить место</h3>
+
+                        <h:outputLabel for="placeSelect"
+                                       value="Туристическое место"/>
+
+                        <h:selectOneMenu id="placeSelect"
+                                         value="#{routeBean.selectedPlaceId}"
+                                         required="true">
+
+                            <f:selectItem itemLabel="Выберите место"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true"/>
+
+                            <f:selectItems value="#{routeBean.availablePlaces}"
+                                           var="p"
+                                           itemValue="#{p.id}"
+                                           itemLabel="#{p.name}"/>
+
+                        </h:selectOneMenu>
+
+                        <h:outputLabel for="minutes"
+                                       value="Время посещения (минуты)"/>
+
+                        <h:inputText id="minutes"
+                                     value="#{routeBean.visitMinutes}"
+                                     required="true">
+                            <f:validateLongRange minimum="1"/>
+                        </h:inputText>
+
+                        <h:messages style="color:red"/>
+
+                        <h:commandButton value="Добавить место"
+                                         action="#{routeBean.addPlace}"
+                                         styleClass="btn"/>
+
+                    </h:form>
+
+                </div>
+
+            </ui:fragment>
+
+        </h:panelGroup>
+
+    </main>
+
+</h:body>
+</html>
