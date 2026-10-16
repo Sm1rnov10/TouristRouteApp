@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             version="3.1">
+
+    <persistence-unit name="TouristRoutePU"
+                      transaction-type="JTA">
+
+        <jta-data-source>jdbc/TouristRouteDB</jta-data-source>
+
+        <class>com.tourist.entity.Place</class>
+        <class>com.tourist.entity.Route</class>
+        <class>com.tourist.entity.RoutePlace</class>
+
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
+        <properties>
+            <property
+                    name="jakarta.persistence.schema-generation.database.action"
+                    value="none"/>
+        </properties>
+
+    </persistence-unit>
+
+</persistence>

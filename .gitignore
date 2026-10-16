@@ -1,0 +1,20 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Maven
+target/
+
+# Java
+*.class
+*.log
+
+# Временные файлы
+*.tmp
+*.bak
+
+# Локальные файлы
+.env
+
+# Случайно созданная папка в корне проекта
+/WEB-INF/
